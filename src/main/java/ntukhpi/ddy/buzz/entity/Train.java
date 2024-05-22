@@ -8,8 +8,6 @@ import ntukhpi.ddy.buzz.enums.trainType.trainType;
 import ntukhpi.ddy.buzz.enums.trainType.trainTypeConverter;
 import ntukhpi.ddy.buzz.enums.variantRuhu.variantRuhu;
 import ntukhpi.ddy.buzz.enums.variantRuhu.variantRuhuConverter;
-import ntukhpi.ddy.buzz.enums.wagonType.wagonType;
-import ntukhpi.ddy.buzz.enums.wagonType.wagonTypeConverter;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -32,11 +30,9 @@ public class Train {
     @Convert(converter = trainTypeConverter.class)
     private trainType TrainType;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "wagonType", nullable = false, length = 20)
-    @Convert(converter = wagonTypeConverter.class)
-    private wagonType WagonType;
-
+    @ManyToOne
+    @JoinColumn(name = "wagon_id", nullable = false)
+    private Wagon[] wagon;
 
     @Column(nullable = false, length = 50)
     private String pointVid;
@@ -58,10 +54,13 @@ public class Train {
     @Column(nullable = false)
     private LocalTime timeToArrive;
 
-    public Train(String number,String trainTypes, String wagonTypes, String pointVid, String pointDo, String VariantRuhu, String timeToGo, String duration){
+    @Column(nullable = false, length =  5)
+    private double distance;
+
+    public Train(String number,String trainTypes, Wagon[] wagon, String pointVid, String pointDo, String VariantRuhu, String timeToGo, String duration, double distance){
         this.id = 0L;
         this.TrainType = trainType.getByType(trainTypes);
-        this.WagonType = wagonType.getByType(wagonTypes);
+        System.arraycopy(wagon, 0, this.wagon, 0, 10);
         this.number = number;
         this.pointVid = pointVid;
         this.pointDo = pointDo;
@@ -73,18 +72,22 @@ public class Train {
         temp = temp.plusHours(tempDur.getHour());
         temp = temp.plusMinutes(tempDur.getMinute());
         this.timeToArrive = temp;
+        this.distance = distance;
     }
     public Train(String number){
         this.id = 0L;
         this.number = number;
         this.TrainType = trainType.getTypesById(1);
-        this.WagonType = wagonType.getTypeById(4);
+        for(int i = 0; i < 10; i++){
+            this.wagon[i] = new Wagon("Кировоградський завод");
+        }
         this.pointVid = "Київський Вокзал";
         this.pointDo = "Харьківський Вокзал";
         this.VariantRuhu = variantRuhu.getVariantById(2);
         this.timeToGo = LocalTime.of(10, 55);
         this.duration = LocalTime.of(05, 10);
         this.timeToArrive = LocalTime.of(16, 05);
+        this.distance = 500;
     }
     public String TimeToGoToSting() {
         long hours = timeToGo.getHour();
@@ -114,9 +117,10 @@ public class Train {
         final StringBuilder sb = new StringBuilder("" + id + ": ");
         sb.append("Номер потяга - ").append(number).append(", \n");
         sb.append("Тип потяга: ").append(TrainType.getDisplayName()).append(": \n");
-        sb.append("Тип вагона: ").append(WagonType.getDisplayName()).append(": \n");
+        sb.append("Тип вагона: ").append(wagon[0].getWagonType().getDisplayName()).append(": \n");
         sb.append("Місце відправлення: ").append(pointVid).append(", \n");
         sb.append("Місце призначення: ").append(pointDo).append(", \n");
+        sb.append("Відстань: ").append(distance).append(", \n");
         sb.append("Час відправлення: ").append(getTimeToGo()).append(", \n");
         sb.append("Вірант руху: ").append(VariantRuhu.getDisplayName()).append(": \n");
         sb.append("Час у дорозі: ").append(getDuration()).append(", \n");
