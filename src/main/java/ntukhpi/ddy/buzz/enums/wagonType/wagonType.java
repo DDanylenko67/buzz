@@ -56,28 +56,4 @@ public enum wagonType {
         }
         return wtNames;
     }
-
-    public static int getNumberOfSeats(wagonType wagonType){
-        int number = 0;
-        if(wagonType.getDisplayName().equals("Спальний вагон")){
-            number = 18;
-        } else if (wagonType.getDisplayName().equals("Купе")) {
-            number = 36;
-        } else if (wagonType.getDisplayName().equals("Плакарт")) {
-            number = 54;
-        }
-        else if (wagonType.getDisplayName().equals("Відкритий — 2-го класу")) {
-            number = 68;
-        }
-        else if (wagonType.getDisplayName().equals("Купейний — 1-го клас")) {
-            number = 45;
-        }
-        else if (wagonType.getDisplayName().equals("Сидячий — 1-го класу")) {
-            number = 56;
-        }
-        else if (wagonType.getDisplayName().equals("Сидячий — 2-го класу")) {
-            number = 80;
-        }
-        return number;
-    }
 }
