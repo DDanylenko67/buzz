@@ -44,7 +44,7 @@ public class WagonServiceImpl implements WagonService {
     }
 
     @Override
-    public Wagon getWagonByType(wagonType wagonType) {
-        return wagonRepository.findByWagonType(wagonType);
+    public List<Wagon> getWagonsByType(wagonType wagonType) {
+        return wagonRepository.findWagonsByWagonTypes(wagonType);
     }
 }

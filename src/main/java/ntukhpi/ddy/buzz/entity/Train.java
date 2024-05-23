@@ -8,9 +8,11 @@ import ntukhpi.ddy.buzz.enums.trainType.trainType;
 import ntukhpi.ddy.buzz.enums.trainType.trainTypeConverter;
 import ntukhpi.ddy.buzz.enums.variantRuhu.variantRuhu;
 import ntukhpi.ddy.buzz.enums.variantRuhu.variantRuhuConverter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Getter
 @Setter
@@ -32,7 +34,7 @@ public class Train {
 
     @ManyToOne
     @JoinColumn(name = "wagon_id", nullable = false)
-    private Wagon[] wagon;
+    private Wagon wagon;
 
     @Column(nullable = false, length = 50)
     private String pointVid;
@@ -46,12 +48,14 @@ public class Train {
     private variantRuhu VariantRuhu;
 
     @Column(nullable = false)
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime timeToGo;
-
+    @DateTimeFormat(pattern = "HH:mm")
     @Column(nullable = false)
     private LocalTime duration;
 
     @Column(nullable = false)
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime timeToArrive;
 
     @Column(nullable = false, length =  5)
@@ -78,9 +82,7 @@ public class Train {
         this.id = 0L;
         this.number = number;
         this.TrainType = trainType.getTypesById(1);
-        for(int i = 0; i < 10; i++){
-            this.wagon[i] = new Wagon("Кировоградський завод");
-        }
+        wagon = new Wagon("Кировоградський");
         this.pointVid = "Київський Вокзал";
         this.pointDo = "Харьківський Вокзал";
         this.VariantRuhu = variantRuhu.getVariantById(2);
@@ -117,7 +119,7 @@ public class Train {
         final StringBuilder sb = new StringBuilder("" + id + ": ");
         sb.append("Номер потяга - ").append(number).append(", \n");
         sb.append("Тип потяга: ").append(TrainType.getDisplayName()).append(": \n");
-        sb.append("Тип вагона: ").append(wagon[0].getWagonType().getDisplayName()).append(": \n");
+        sb.append("Тип вагона: ").append(wagon.getWagonTypes().getDisplayName()).append(": \n");
         sb.append("Місце відправлення: ").append(pointVid).append(", \n");
         sb.append("Місце призначення: ").append(pointDo).append(", \n");
         sb.append("Відстань: ").append(distance).append(", \n");

@@ -5,11 +5,14 @@ import ntukhpi.ddy.buzz.enums.variantRuhu.variantRuhu;
 public enum wagonType {
     sleep("Спальний вагон"),
     coupe("Купе"),
+    lux("Люкс"),
     coupeFirst("Купейний — 1-го класу"),
     plackart("Плакарт"),
     interCityFirst("Сидячий — 1-го класу"),
     interCitySecond("Сидячий — 2-го класу"),
+    firstSeated("Відкритий - 1-го класу"),
     second("Відкритий — 2-го класу");
+
 
     private final String displayName;
 

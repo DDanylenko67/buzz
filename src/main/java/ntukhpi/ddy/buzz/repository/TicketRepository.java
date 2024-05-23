@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
     Ticket findByDateToGoAndWagonAndSeat(LocalDate date, int wagon, int seat);
