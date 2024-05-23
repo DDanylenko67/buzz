@@ -1,6 +1,8 @@
 package ntukhpi.ddy.buzz.service.impl;
 
 import ntukhpi.ddy.buzz.entity.Tariff;
+import ntukhpi.ddy.buzz.enums.trainType.trainType;
+import ntukhpi.ddy.buzz.enums.wagonType.wagonType;
 import ntukhpi.ddy.buzz.repository.TariffRepository;
 import ntukhpi.ddy.buzz.repository.TicketRepository;
 import ntukhpi.ddy.buzz.repository.TrainRepository;
@@ -47,5 +49,9 @@ public class TariffServiceImpl implements TariffService {
     @Override
     public Tariff getTariffByDate(LocalDate localDate) {
         return tariffRepository.findByDate(localDate);
+    }
+    @Override
+    public Tariff getTariffByTypes(wagonType wagonType, trainType trainType) {
+        return tariffRepository.findTariffByWagonTypesAndTrainTypes(wagonType, trainType);
     }
 }

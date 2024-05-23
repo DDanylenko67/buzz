@@ -12,5 +12,5 @@ public interface WagonService {
     Wagon getWagonById(Long id);
     Wagon updateWagon(Long id, Wagon wagon);
     void deleteWagonById(Long id);
-    Wagon getWagonByType(wagonType wagonType);
+    List<Wagon> getWagonsByType(wagonType wagonType);
 }

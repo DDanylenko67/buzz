@@ -20,8 +20,9 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "train_id", nullable = false)
     private Train train;
-    @Column(nullable = false, length = 30)
-    private String Owner;
+
+    @Column(nullable = false, length = 60)
+    private String owner;
     @Column(nullable = false, length = 10)
     private String documentID;
 
@@ -41,7 +42,7 @@ public class Ticket {
             }else{
                 this.id = 0L;
                 this.train = train;
-                this.Owner = Owner;
+                this.owner = Owner;
                 this.documentID = document;
                 this.wagon = wagon;
                 this.seat = seat;
@@ -59,7 +60,7 @@ public class Ticket {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("" + id + ": ");
-        sb.append(Owner).append(" - ");
+        sb.append(owner).append(" - ");
         sb.append(train.getNumber()).append(", ");
         sb.append(documentID).append(", ");
         sb.append(wagon).append(", ");
@@ -78,7 +79,7 @@ public class Ticket {
 
 
     public String getOwner() {
-        return Owner;
+        return owner;
     }
 
     public String getDocumentID() {
