@@ -48,4 +48,11 @@ public class Wagon {
         sb.append(numberOfSeats).append(" - ");
         return sb.toString();
     }
+
+    public String getDisplay(){
+        final StringBuilder sb = new StringBuilder("" + factory + ": ");
+        sb.append(wagonTypes.getDisplayName()).append(" - ");
+        sb.append(numberOfSeats).append(" місць");
+        return sb.toString();
+    }
 }

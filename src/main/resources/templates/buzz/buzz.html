@@ -17,15 +17,14 @@
             justify-content: center;
             align-items: center;
             margin-bottom: 20px;
-            gap: 20px; /* Added for spacing between cards */
+            gap: 20px;
         }
 
         .card {
-            background-color: rgba(255, 255, 255, 0.8); /* White with transparency */
-            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
             border-radius: 10px;
             text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px); /* Optional: Add blur effect for a more modern look */
         }
 
@@ -54,7 +53,8 @@
                     <a href="/signUp" class="btn btn-light" style="color: #3f48cc" th:if="${!loggedIn}">Зареєструватися</a>
                     <a href="/login" class="btn btn-primary" style="color: white" th:if="${!loggedIn}">Увійти</a>
                     <a href="/logout" class="btn btn-light" style="color: #3f48cc" th:if="${loggedIn}">Вийти</a>
-                    <a href="" class="btn btn-primary" style="color: white" th:if="${loggedIn}">Персональний кабінет</a>
+                    <a href="" class="btn btn-primary" style="color: white" th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}">Персональний кабінет</a>
+                    <a href="/admin" class="btn btn-danger" style="color: white" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">Адміністративна панель</a>
                 </div>
         </div>
     </nav>
@@ -69,11 +69,12 @@
     <div class="container d-flex justify-content-center align-items-center mb-2 my-5">
         <div class="card p-4 w-100">
             <div class="d-flex flex-row justify-content-center align-items-center">
-                <input type="text" class="form-control me-2" placeholder="Звідки" id="search-text">
+                <input type="text" class="form-control me-2" placeholder="Звідки" id="search-text" >
                 <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" fill="currentColor" class="bi bi-arrow-right" viewBox="0 0 16 16">
                     <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"/>
                 </svg>
-                <input type="text" class="form-control me-2" placeholder="Куди" id="search-text-city">
+                <input type="text" class="form-control me-2" placeholder="Куди" id="search-text-city" >
+
                 <input type="date" class="form-control me-2" name="timeToGos" id="dateToGos">
                 <button type="button" class="btn btn-primary" style="color: white;">Знайти</button>
             </div>
@@ -85,16 +86,19 @@
         <div class="recent-purchases card">
             <h2>Щойно придбали</h2>
             <ul>
-                <li>Київ → Чернігів</li>
-                <li>Київ → Харків</li>
-                <li>Київ → Одеса</li>
-                <li>Київ → Дніпро</li>
+                <li th:each="ticket :${last4Tickets}">
+                    <span th:text="${ticket.train.pointVid}"></span> -> <span th:text="${ticket.train.pointDo}"></span>
+                </li>
+
             </ul>
         </div>
+
+
+
         <div class="total-tickets card">
             <h2>Всього квитків продано</h2>
             <div >
-            <h1>100,000!</h1>
+            <h1><span th:text="${count}"></span>!</h1>
             </div>
         </div>
     </div>

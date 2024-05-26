@@ -54,6 +54,7 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public String getInfoPresenceTicketByIDTrain(Long idTrain) {
-        return null;
+        List<Ticket> list =  ticketRepository.findTicketsByTrainId(idTrain);
+        return list.isEmpty()?"":"Є дані про квиток на потяг у БД!";
     }
 }
