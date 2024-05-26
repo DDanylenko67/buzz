@@ -55,19 +55,16 @@ public class TestTicket {
     }
     @Test
     void calcPriceTest(){
-        Ticket ticket = ticketService.getTicketById(1L);
-        System.out.println(ticket);
-        ticket.setDateToGo(LocalDate.of(2024, 12, 31));
-        ticket.getTrain().setTrainType(trainType.passenger);
-        ticket.getTrain().getWagon().setWagonTypes(wagonType.plackart);
-        Tariff tariff = tariffService.getTariffByTypes(ticket.getTrain().getWagon().getWagonTypes(), ticket.getTrain().getTrainType());
-        System.out.println(ticket.getTrain());
-        System.out.println(tariff);
-        double sum = tariff.getBasePrice();
-        for (int i = 0; i < ticket.getTrain().getDistance(); i+=10){
-            sum += tariff.getDecadeSum();
-        }
-        System.out.println(sum*1.07*1*3);
-        System.out.println(tariff.compPrice(ticket));
+
+        Ticket temp1 = ticketService.getTicketById(1L);
+        Ticket temp2 = ticketService.getTicketById(1L);
+
+        temp1.setDateToGo(LocalDate.of(2024, 1, 20));
+        temp2.setDateToGo(LocalDate.of(2024, 1, 21));
+
+        Tariff tariff = tariffService.getTariffByTypes(temp1.getTrain().getWagon().getWagonTypes(), temp1.getTrain().getTrainType());
+
+        System.out.println(tariff.compPrice(temp1));
+        System.out.println(tariff.compPrice(temp2));
     }
 }
