@@ -96,7 +96,7 @@ public class Tariff {
         } else if (data.getDayOfWeek().equals(DayOfWeek.TUESDAY) || data.getDayOfWeek().equals(DayOfWeek.WEDNESDAY)) {
             indexInc = 0.9;
         }
-        else if (ticket.getTrain().getWagon().getWagonTypes().getDisplayName().equals(wagonType.interCitySecond.getDisplayName())) {
+        if (ticket.getTrain().getTrainType().getDisplayName().equals(trainType.interCityPlus.getDisplayName())) {
             long day = ChronoUnit.DAYS.between(LocalDate.now(), data);
             if (day >= 30) {
                 koefIndex = 0.85;
@@ -111,13 +111,6 @@ public class Tariff {
             } else {
                 koefIndex = 1.15;
             }
-        } else if (ticket.getTrain().getWagon().getWagonTypes().getDisplayName().equals(wagonType.sleep.getDisplayName())) {
-                koefIndex = 1.02;
-            } else if (ticket.getTrain().getWagon().getWagonTypes().getDisplayName().equals(wagonType.coupeFirst.getDisplayName())) {
-                koefIndex = 1.5;
-            } else if (ticket.getTrain().getWagon().getWagonTypes().getDisplayName().equals(wagonType.second.getDisplayName())){
-                koefIndex = 1.15;
-
         } else {
             koefIndex = findCoef(data);
         }
@@ -132,7 +125,7 @@ public class Tariff {
 
 
     private double findCoef(LocalDate date){
-        if(date.isAfter(LocalDate.of(date.getYear(), 1, 1)) &&  date.isBefore(LocalDate.of(date.getYear(), 1, 21))){
+        if(date.isAfter(LocalDate.of(date.minusYears(1).getYear(), 1, 1)) &&  date.isBefore(LocalDate.of(date.getYear(), 1, 21))){
             return 1.02;
         } if(date.isAfter(LocalDate.of(date.getYear(), 1, 20)) &&  date.isBefore(LocalDate.of(date.getYear(), 2, 1))){
             return 0.86;
@@ -143,14 +136,14 @@ public class Tariff {
         else if(date.isAfter(LocalDate.of(date.getYear(), 2, 29)) &&  date.isBefore(LocalDate.of(date.getYear(), 4, 1))){
             return 1.01;
         }
-        else if(date.isAfter(LocalDate.of(date.getYear(), 3, 31)) &&  date.isBefore(LocalDate.of(date.getYear(), 5, 1))){
+        else if(date.isAfter(LocalDate.of(date.getYear(), 3, 31)) &&  date.isBefore(LocalDate.of(date.getYear(), 4, 28))){
             return 1.02;
+        }
+        else if(date.isAfter(LocalDate.of(date.getYear(), 5, 8)) &&  date.isBefore(LocalDate.of(date.getYear(), 5, 10))){
+            return 0.8;
         }
         else if(date.isAfter(LocalDate.of(date.getYear(), 4, 27)) &&  date.isBefore(LocalDate.of(date.getYear(), 5, 9))){
             return 1.03;
-        }
-        else if(date.isAfter(LocalDate.of(date.getYear(), 5, 9)) &&  date.isBefore(LocalDate.of(date.getYear(), 5, 10))){
-            return 0.8;
         }
         else if(date.isAfter(LocalDate.of(date.getYear(), 5, 9)) &&  date.isBefore(LocalDate.of(date.getYear(), 6, 1))){
             return 1.01;
@@ -158,13 +151,13 @@ public class Tariff {
         else if(date.isAfter(LocalDate.of(date.getYear(), 5, 31)) &&  date.isBefore(LocalDate.of(date.getYear(), 9, 1))){
             return 1.07;
         }
-        else if(date.isAfter(LocalDate.of(date.getYear(), 8, 31)) &&  date.isBefore(LocalDate.of(date.getYear(), 9, 29))){
+        else if(date.isAfter(LocalDate.of(date.getYear(), 8, 31)) &&  date.isBefore(LocalDate.of(date.getYear(), 10, 1))){
             return 1.02;
         }
-        else if(date.isAfter(LocalDate.of(date.getYear(), 9, 30)) &&  date.isBefore(LocalDate.of(date.getYear(), 12, 23))){
+        else if(date.isAfter(LocalDate.of(date.getYear(), 9, 30)) &&  date.isBefore(LocalDate.of(date.getYear(), 12, 25))){
             return 0.93;
         }
-        else if(date.isAfter(LocalDate.of(date.getYear(), 12, 24)) &&  date.isBefore(LocalDate.of(date.getYear(), 12, 29))){
+        else if(date.isAfter(LocalDate.of(date.getYear(), 12, 24)) &&  date.isBefore(LocalDate.of(date.getYear(), 12, 31))){
             return 1.1;
         }
         else if(date.isAfter(LocalDate.of(date.getYear(), 12, 30))){
