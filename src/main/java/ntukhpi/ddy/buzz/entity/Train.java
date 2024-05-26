@@ -59,12 +59,12 @@ public class Train {
     private LocalTime timeToArrive;
 
     @Column(nullable = false, length =  5)
-    private double distance;
+    private int distance;
 
-    public Train(String number,String trainTypes, Wagon[] wagon, String pointVid, String pointDo, String VariantRuhu, String timeToGo, String duration, double distance){
+    public Train(String number,String trainTypes, Wagon wagon, String pointVid, String pointDo, String VariantRuhu, String timeToGo, String duration, int distance){
         this.id = 0L;
         this.TrainType = trainType.getByType(trainTypes);
-        System.arraycopy(wagon, 0, this.wagon, 0, 10);
+        this.wagon = wagon;
         this.number = number;
         this.pointVid = pointVid;
         this.pointDo = pointDo;

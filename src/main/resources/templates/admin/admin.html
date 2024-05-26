@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+>
+<style type="text/css">
+    content {
+        max-width: 1000px;
+        margin: auto;
+    }
+    .form-select-primary {
+        background-color: #0d6efd;
+        color: white;
+        border-color: #0d6efd;
+    }
+
+    .form-select-primary:focus {
+        background-color: #0b5ed7;
+        color: white;
+        border-color: #0a58ca;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+
+</style>
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+          crossorigin="anonymous">
+    <title>Панель адміністратора</title>
+</head>
+<body>
+<nav class="navbar fixed-top navbar-expand-lg nav-dark" style="background-color: #3f48cc">
+    <div class="container">
+        <a class="navbar-brand" href="/buzz">
+            <img src="/images/logo.jpg" alt="BUZZ" width="200" height="100">
+        </a>
+        <div class="d-flex">
+            <a href="/buzz" class="btn btn-light" style="color: #3f48cc">На головну</a>
+        </div>
+    </div>
+</nav>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<div style="display: flex; align-items: center;">
+        <form action="/admin/trains/new" method="GET">
+            <button class="btn btn-primary" style="color:white" accesskey="d"  >Додати Потяг</button>
+        </form>
+            <select id="vr_filter" class="form-select-primary" name="vr_filter" onchange="filterByVR()">
+                <option value="всі">всі</option>
+                <option th:each="vr : ${T(ntukhpi.ddy.buzz.enums.trainType.trainType).values()}"
+                        th:value="${vr}" th:text="${vr.getDisplayName()}"></option>
+            </select>
+        <button  class="btn btn-primary" style="color:white" onclick="sortTableByIndex(0)">Сортування за номер потягу</button>
+        <button class="btn btn-primary" style="color:white" onclick="sortTableValueDur(7)" >Сортування за часом у дорозі</button>
+        <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(3)" >Сортування за місцев відправки</button>
+        <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(4)" >Сортування за прибуття</button>
+        <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(9)" >Сортування за відстаню</button>
+        <br>
+        <b><label for="search-text" style="color: #3f48cc"> Пошук за місцем прибуття </label></b>
+        <input type="text" placeholder="Введіть місто" id="search-text" onkeyup="tableSearch()">
+        <form th:action="@{/admin}">
+            <button class="btn btn-primary" style="color:white" type="submit" accesskey="x">Скинути</button>
+        </form>
+</div>
+<br>
+<table id="trains-table" class="table">
+    <tr style="color: #3f48cc">
+        <th>Номер</th>
+        <th>Тип потяга</th>
+        <th>Тип вагона</th>
+        <th>Місце відправки</th>
+        <th>Місце прибуття</th>
+        <th>Варіант руху</th>
+        <th>Час відправки</th>
+        <th>Час у дорозі</th>
+        <th>Час прибуття </th>
+        <th>Відстань </th>
+        <th colspan="3" style="text-align: center;">Операції</th>
+    </tr>
+    <tr th:each="train: ${trains}">
+        <td th:text="${train.getNumber()}"></td>
+        <td th:text="${train.getTrainType().getDisplayName()}"></td>
+        <td th:text="${train.getWagon().getWagonTypes().getDisplayName()}"></td>
+        <td th:text="${train.getPointVid()}"></td>
+        <td th:text="${train.getPointDo()}"></td>
+        <td th:text="${train.getVRName()}"></td>
+        <td th:text="${train.getTimeToGo()}"></td>
+        <td th:text="${train.getDuration()}"></td>
+        <td th:text="${train.getTimeToArrive()}"></td>
+        <td th:text="${train.getDistance()} + ' км' "></td>
+        <td>
+            <form th:action="@{/admin/trains/edit/{id} (id=${train.id})}" >
+                <button type="submit" style="color: #3f48cc">  Редагувати  </button>
+            </form>
+        </td>
+        <td>
+            <form th:action="@{/admin/trains/report/{id} (id=${train.id})}" >
+                <button type="submit" style="color: #3f48cc">  Сформувати звіт  </button>
+            </form>
+        </td>
+        <td>
+            <form th:action="@{/admin/trains/del/{id} (id=${train.id})}" >
+                <button type="submit" onclick="return confirmation()" style="color: #3f48cc">   Вилучити   </button>
+            </form>
+        </td>
+
+    </tr>
+</table>
+
+<nav class="navbar fixed-bottom navbar-expand-lg nav-dark" style="background-color: #3f48cc">
+
+</nav>
+</body>
+<script type="text/javascript">
+    function confirmation() {
+        return confirm('Ви впевнені, що хочете вилучити дані? Але, якщо у потягу є  квитки ви не зможете видалити його.');
+    }
+
+    function tableSearch() {
+        document.getElementById('vr_filter').selectedIndex = 0;
+        var phrase = document.getElementById('search-text');
+        var table = document.getElementById('trains-table');
+        var regPhrase = new RegExp(phrase.value, 'i');
+        var flag = false;
+        for (var i = 1; i < table.rows.length; i++) {
+            flag = regPhrase.test(table.rows[i].cells[4].innerHTML);
+            if (flag) {
+                table.rows[i].style.display = "";
+            } else {
+                table.rows[i].style.display = "none";
+            }
+        }
+    }
+
+    function sortTableValueDur() {
+        var table, rows, switching, i, x, y, shouldSwitch;
+        table = document.getElementById("trains-table");
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[7];
+                y = rows[i + 1].getElementsByTagName("TD")[7];
+                if ((x.innerHTML.length > y.innerHTML.length)
+                    || ((x.innerHTML.length === y.innerHTML.length) && (x.innerHTML > y.innerHTML))
+                ) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+    function sortTableByIndex(col_index) {
+        var table, rows, switching, i, x, y, shouldSwitch;
+        table = document.getElementById("trains-table");
+        switching = true;
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[col_index];
+                y = rows[i + 1].getElementsByTagName("TD")[col_index];
+
+                // Use localeCompare for case-insensitive string comparison
+                var compareResult = x.innerHTML.localeCompare(y.innerHTML, 'uk-UA', { sensitivity: 'base' });
+
+                if (compareResult > 0) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+    }
+
+    function filterByVR() {
+        var vrSelect = document.getElementById('vr_filter').selectedIndex;
+        var vrOptions = document.getElementById('vr_filter').options;
+        if (vrOptions[vrSelect].text != "всі") {
+            var table = document.getElementById('trains-table');
+            for (var i = 1; i < table.rows.length; i++) {
+                if (vrOptions[vrSelect].text === table.rows[i].cells[1].innerHTML) {
+                    table.rows[i].style.display = "";
+                } else {
+                    table.rows[i].style.display = "none";
+                }
+            }
+        } else {
+            var table = document.getElementById('trains-table');
+            for (var i = 1; i < table.rows.length; i++) {
+                table.rows[i].style.display = "";
+            }
+        }
+    }
+</script>
+</html>
