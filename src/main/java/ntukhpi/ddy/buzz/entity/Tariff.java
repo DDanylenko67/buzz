@@ -32,7 +32,7 @@ public class Tariff {
     private LocalDate date;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "trainType", nullable = false, length = 20)
+    @Column(name = "trainType", nullable = false, length = 50)
     @Convert(converter = trainTypeConverter.class)
     private trainType trainTypes;
 
@@ -84,20 +84,18 @@ public class Tariff {
         return sb.toString();
     }
 
-    //визначається шляхом множення тарифу на коефіцієнт індексації за календарними періодами  та на коефіцієнт зниження (підвищення).
-    public double compPrice(Ticket ticket) {
+    public String compPrice(LocalDate date, int distance, trainType TrainType) {
         double koefIndex = 1;
         double indexInc = 1;
         double price = 0;
 
-        LocalDate data = ticket.getDateToGo();
-        if (data.getDayOfWeek().equals(DayOfWeek.FRIDAY) || data.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
+        if (date.getDayOfWeek().equals(DayOfWeek.FRIDAY) || date.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
             indexInc = 1.1;
-        } else if (data.getDayOfWeek().equals(DayOfWeek.TUESDAY) || data.getDayOfWeek().equals(DayOfWeek.WEDNESDAY)) {
+        } else if (date.getDayOfWeek().equals(DayOfWeek.TUESDAY) || date.getDayOfWeek().equals(DayOfWeek.WEDNESDAY)) {
             indexInc = 0.9;
         }
-        if (ticket.getTrain().getTrainType().getDisplayName().equals(trainType.interCityPlus.getDisplayName())) {
-            long day = ChronoUnit.DAYS.between(LocalDate.now(), data);
+        if (TrainType.getDisplayName().equals(trainType.interCityPlus.getDisplayName())) {
+            long day = ChronoUnit.DAYS.between(LocalDate.now(), date);
             if (day >= 30) {
                 koefIndex = 0.85;
             } else if (day >= 25) {
@@ -112,15 +110,15 @@ public class Tariff {
                 koefIndex = 1.15;
             }
         } else {
-            koefIndex = findCoef(data);
+            koefIndex = findCoef(date);
         }
         price = basePrice;
-        for(int i = 0; i < ticket.getTrain().getDistance(); i+=10){
+        for(int i = 0; i < distance; i+=10){
              price += decadeSum;
         }
         System.out.println("Price = " + price + " KoefIndex = " + koefIndex + " IndexInc = " + indexInc + " IndexComfort  =" + indexComfort);
         price = price * koefIndex * indexComfort * indexInc;
-        return price;
+        return String.format("%.1f", price);
     }
 
 

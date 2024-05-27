@@ -67,23 +67,35 @@
                    required/>
         </p>
         <label>Тип потяга</label>
-        <div class="form-group mb-3">
+        <div class="form-group mb-3" >
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" th:field="*{trainType}" value="interCityPlus">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1" th:field="*{trainType}" value="interCityPlus" required>
                 <label class="form-check-label" for="flexRadioDefault1">
                     Високо швидкісний
                 </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" th:field="*{trainType}" value="interCity">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" th:field="*{trainType}" value="interCity" required>
                 <label class="form-check-label" for="flexRadioDefault2">
                     Швидкісний
                 </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3" th:field="*{trainType}"  checked value="passenger">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3" th:field="*{trainType}"  checked value="passenger" required>
                 <label class="form-check-label" for="flexRadioDefault3">
                     Пасажирський
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault7" th:field="*{trainType}"  checked value="fastfull" required>
+                <label class="form-check-label" for="flexRadioDefault7">
+                    Швідкий
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault5" th:field="*{trainType}"  checked value="seasonDecember" required>
+                <label class="form-check-label" for="flexRadioDefault5">
+                    Сезонний зимовий
                 </label>
             </div>
         </div>

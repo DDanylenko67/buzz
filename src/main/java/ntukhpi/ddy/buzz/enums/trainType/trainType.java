@@ -3,8 +3,9 @@ package ntukhpi.ddy.buzz.enums.trainType;
 import ntukhpi.ddy.buzz.enums.variantRuhu.variantRuhu;
 
 public enum trainType {
-    interCityPlus("Високо швидкісні"),
-    interCity("Швидкісні"),
+    interCityPlus("Високо швидкісний"),
+    interCity("Швидкісний"),
+    fastfull("Швидкий"),
     passenger("Пасажирський");
 
 

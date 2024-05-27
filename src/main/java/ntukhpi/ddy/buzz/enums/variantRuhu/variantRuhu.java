@@ -3,7 +3,8 @@ package ntukhpi.ddy.buzz.enums.variantRuhu;
 public enum variantRuhu {
     daily("Щоденний"),
     unpaired("Непарні"),
-    season("Сезоний"),
+    seasonSummer("Сезоний літній"),
+    seasonDecember("Сезоний зимовий"),
     paired("Парні");
 
     private final String displayName;
