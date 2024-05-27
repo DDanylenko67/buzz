@@ -62,9 +62,6 @@ public class TestTicket {
         temp1.setDateToGo(LocalDate.of(2024, 1, 20));
         temp2.setDateToGo(LocalDate.of(2024, 1, 21));
 
-        Tariff tariff = tariffService.getTariffByTypes(temp1.getTrain().getWagon().getWagonTypes(), temp1.getTrain().getTrainType());
-
-        System.out.println(tariff.compPrice(temp1));
-        System.out.println(tariff.compPrice(temp2));
+        Tariff tariff = tariffService.getTariffByTypes(temp1.getTrain().getWagon().getWagonTypes(), temp1.getTrain().getTrainType());;
     }
 }

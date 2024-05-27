@@ -24,20 +24,24 @@ public class TestCRUDTariff{
         Tariff tariff2 = new Tariff("2024-04-23", trainType.passenger.getDisplayName(), wagonType.sleep.getDisplayName(), 95.01, 4, 5);
         tariffService.saveTariff(tariff2);
     }
-
+    @Test
+    void addTariff(){
+        Tariff tariff = new Tariff("2024-05-23", trainType.fastfull.getDisplayName(), wagonType.coupe.getDisplayName(), 40.63, 3, 5);
+        tariffService.saveTariff(tariff);
+    }
     @Test
     void addTariffs(){
-        Tariff tariff = new Tariff("2024-05-23", trainType.interCity.getDisplayName(), wagonType.coupe.getDisplayName(), 40.63, 3, 5);
+        Tariff tariff = new Tariff("2024-05-23", trainType.fastfull.getDisplayName(), wagonType.coupe.getDisplayName(), 40.63, 3, 5);
         tariffService.saveTariff(tariff);
-        Tariff tariff1 = new Tariff("2024-05-23", trainType.interCity.getDisplayName(), wagonType.lux.getDisplayName(), 100.24, 4.38, 10);
+        Tariff tariff1 = new Tariff("2024-05-23", trainType.fastfull.getDisplayName(), wagonType.lux.getDisplayName(), 100.24, 4.38, 10);
         tariffService.saveTariff(tariff1);
-        Tariff tariff2 = new Tariff("2024-05-23", trainType.interCity.getDisplayName(), wagonType.sleep.getDisplayName(), 100.24, 4.38, 5);
+        Tariff tariff2 = new Tariff("2024-05-23", trainType.fastfull.getDisplayName(), wagonType.sleep.getDisplayName(), 100.24, 4.38, 5);
         tariffService.saveTariff(tariff2);
-        Tariff tariff3 = new Tariff("2024-05-23", trainType.interCity.getDisplayName(), wagonType.plackart.getDisplayName(), 19.87, 1.5, 3);
+        Tariff tariff3 = new Tariff("2024-05-23", trainType.fastfull.getDisplayName(), wagonType.plackart.getDisplayName(), 19.87, 1.5, 3);
         tariffService.saveTariff(tariff3);
-        Tariff tariff4 = new Tariff("2024-05-23", trainType.interCity.getDisplayName(), wagonType.second.getDisplayName(), 11.42, 1, 5);
+        Tariff tariff4 = new Tariff("2024-05-23", trainType.fastfull.getDisplayName(), wagonType.second.getDisplayName(), 11.42, 1, 5);
         tariffService.saveTariff(tariff4);
-        Tariff tariff5 = new Tariff("2024-05-23", trainType.interCity.getDisplayName(), wagonType.firstSeated.getDisplayName(), 11.42, 1, 8);
+        Tariff tariff5 = new Tariff("2024-05-23", trainType.fastfull.getDisplayName(), wagonType.firstSeated.getDisplayName(), 11.42, 1, 8);
         tariffService.saveTariff(tariff5);
         Tariff tariff6 = new Tariff("2024-05-23", trainType.passenger.getDisplayName(), wagonType.coupe.getDisplayName(), 38.45, 2.5, 5);
         tariffService.saveTariff(tariff6);
@@ -51,9 +55,13 @@ public class TestCRUDTariff{
         tariffService.saveTariff(tariff10);
         Tariff tariff11 = new Tariff("2024-05-23", trainType.passenger.getDisplayName(), wagonType.firstSeated.getDisplayName(), 10.48, 1, 5);
         tariffService.saveTariff(tariff11);
-        Tariff tariff12 = new Tariff("2024-05-23", trainType.interCityPlus.getDisplayName(), wagonType.interCitySecond.getDisplayName(), 40.63, 3, 5);
+        Tariff tariff12 = new Tariff("2024-05-23", trainType.interCityPlus.getDisplayName(), wagonType.interCitySecond.getDisplayName(), 60.63, 3, 6);
         tariffService.saveTariff(tariff12);
-        Tariff tariff13 = new Tariff("2024-05-23", trainType.interCityPlus.getDisplayName(), wagonType.interCityFirst.getDisplayName(), 40.63, 3, 10);
+        Tariff tariff13 = new Tariff("2024-05-23", trainType.interCityPlus.getDisplayName(), wagonType.interCityFirst.getDisplayName(), 60.63, 3, 10);
+        tariffService.saveTariff(tariff13);
+        Tariff tariff14 = new Tariff("2024-05-23", trainType.interCity.getDisplayName(), wagonType.interCitySecond.getDisplayName(), 40.63, 3, 6);
+        tariffService.saveTariff(tariff12);
+        Tariff tariff15 = new Tariff("2024-05-23", trainType.interCity.getDisplayName(), wagonType.interCityFirst.getDisplayName(), 40.63, 3, 10);
         tariffService.saveTariff(tariff13);
     }
     @Test
@@ -75,6 +83,8 @@ public class TestCRUDTariff{
         tariffService.updateTariff(4L, tariff);
         System.out.println(tariffService.getTariffById(4L));
         tariffService.deleteTariffById(4L);
+        System.out.println(tariff.compPrice(LocalDate.of(2024, 6, 1), 500, trainType.interCityPlus));
+        System.out.println(tariff.compPrice(LocalDate.of(2024, 7, 1), 500,trainType.interCityPlus));
     }
 
 }

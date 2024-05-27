@@ -69,8 +69,6 @@
                                 type="tel"
                                 pattern="[0-9]{10}"
                                 required
-                                minlength="13"
-                                maxlength="13"
                         />
                         <p th:errors = "*{phone}" class="text-danger"
                            th:if="${#fields.hasErrors('phone')}"></p>

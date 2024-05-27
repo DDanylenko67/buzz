@@ -50,25 +50,28 @@
 <br>
 <br>
 <div style="display: flex; align-items: center;">
-        <form action="/admin/trains/new" method="GET">
-            <button class="btn btn-primary" style="color:white" accesskey="d"  >Додати Потяг</button>
-        </form>
-            <select id="vr_filter" class="form-select-primary" name="vr_filter" onchange="filterByVR()">
-                <option value="всі">всі</option>
-                <option th:each="vr : ${T(ntukhpi.ddy.buzz.enums.trainType.trainType).values()}"
-                        th:value="${vr}" th:text="${vr.getDisplayName()}"></option>
-            </select>
-        <button  class="btn btn-primary" style="color:white" onclick="sortTableByIndex(0)">Сортування за номер потягу</button>
-        <button class="btn btn-primary" style="color:white" onclick="sortTableValueDur(7)" >Сортування за часом у дорозі</button>
-        <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(3)" >Сортування за місцев відправки</button>
-        <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(4)" >Сортування за прибуття</button>
-        <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(9)" >Сортування за відстаню</button>
-        <br>
-        <b><label for="search-text" style="color: #3f48cc"> Пошук за місцем прибуття </label></b>
-        <input type="text" placeholder="Введіть місто" id="search-text" onkeyup="tableSearch()">
-        <form th:action="@{/admin}">
-            <button class="btn btn-primary" style="color:white" type="submit" accesskey="x">Скинути</button>
-        </form>
+    <form action="/admin/trains/new" method="GET">
+        <button class="btn btn-primary" style="color:white" accesskey="d">Додати Потяг</button>
+    </form>
+    <select id="vr_filter" class="form-select-primary" name="vr_filter" onchange="filterByVR()">
+        <option value="всі">всі</option>
+        <option th:each="vr : ${T(ntukhpi.ddy.buzz.enums.trainType.trainType).values()}"
+                th:value="${vr}" th:text="${vr.getDisplayName()}"></option>
+    </select>
+    <button  class="btn btn-primary" style="color:white" onclick="sortTableByIndex(0)">Сортування за номером потягу</button>
+    <button class="btn btn-primary" style="color:white" onclick="sortTableValueDur(7)">Сортування за часом у дорозі</button>
+    <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(3)">Сортування за місцем відправки</button>
+    <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(4)">Сортування за прибуття</button>
+    <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(9)">Сортування за відстаню</button>
+    <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(6)">Сортування за часом відправки</button>
+    <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(8)">Сортування за часом прибуття</button>
+</div>
+<div style="display: flex; align-items: center;">
+    <b><label for="search-text" style="color: #3f48cc"> Пошук за місцем прибуття </label></b>
+    <input type="text" placeholder="Введіть місто" id="search-text" onkeyup="tableSearch()">
+    <form th:action="@{/admin}">
+        <button class="btn btn-primary" style="color:white" type="submit" accesskey="x">Скинути</button>
+    </form>
 </div>
 <br>
 <table id="trains-table" class="table">

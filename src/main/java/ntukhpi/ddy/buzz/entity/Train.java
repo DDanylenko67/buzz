@@ -10,6 +10,7 @@ import ntukhpi.ddy.buzz.enums.variantRuhu.variantRuhu;
 import ntukhpi.ddy.buzz.enums.variantRuhu.variantRuhuConverter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -45,7 +46,7 @@ public class Train {
     @Enumerated(EnumType.STRING)
     @Column(name = "variantRuhu", nullable = false, length = 12)
     @Convert(converter = variantRuhuConverter.class)
-    private variantRuhu VariantRuhu;
+    private variantRuhu variantRuhu;
 
     @Column(nullable = false)
     @DateTimeFormat(pattern = "HH:mm")
@@ -68,7 +69,7 @@ public class Train {
         this.number = number;
         this.pointVid = pointVid;
         this.pointDo = pointDo;
-        this.VariantRuhu = variantRuhu.getByVariant(VariantRuhu);
+        this.variantRuhu = ntukhpi.ddy.buzz.enums.variantRuhu.variantRuhu.getByVariant(VariantRuhu);
         LocalTime temp = LocalTime.parse(timeToGo, DateTimeFormatter.ofPattern("HH:mm"));
         this.timeToGo = temp;
         LocalTime tempDur = LocalTime.parse(duration, DateTimeFormatter.ofPattern("HH:mm"));
@@ -85,7 +86,7 @@ public class Train {
         wagon = new Wagon("Кировоградський");
         this.pointVid = "Київський Вокзал";
         this.pointDo = "Харьківський Вокзал";
-        this.VariantRuhu = variantRuhu.getVariantById(2);
+        this.variantRuhu = ntukhpi.ddy.buzz.enums.variantRuhu.variantRuhu.getVariantById(2);
         this.timeToGo = LocalTime.of(10, 55);
         this.duration = LocalTime.of(05, 10);
         this.timeToArrive = LocalTime.of(16, 05);
@@ -112,7 +113,7 @@ public class Train {
         return number.hashCode();
     }
     public String getVRName() {
-        return VariantRuhu.getDisplayName();
+        return variantRuhu.getDisplayName();
     }
     @Override
     public String toString() {
@@ -124,7 +125,7 @@ public class Train {
         sb.append("Місце призначення: ").append(pointDo).append(", \n");
         sb.append("Відстань: ").append(distance).append(", \n");
         sb.append("Час відправлення: ").append(getTimeToGo()).append(", \n");
-        sb.append("Вірант руху: ").append(VariantRuhu.getDisplayName()).append(": \n");
+        sb.append("Вірант руху: ").append(variantRuhu.getDisplayName()).append(": \n");
         sb.append("Час у дорозі: ").append(getDuration()).append(", \n");
         sb.append("Час прибуття: ").append(getTimeToArrive()).append(". \n").append("-------------\n");
         return sb.toString();

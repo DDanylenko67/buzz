@@ -3,6 +3,7 @@ package ntukhpi.ddy.buzz.controller;
 import ntukhpi.ddy.buzz.entity.Train;
 import ntukhpi.ddy.buzz.entity.Wagon;
 import ntukhpi.ddy.buzz.enums.variantRuhu.variantRuhu;
+import ntukhpi.ddy.buzz.enums.wagonType.wagonType;
 import ntukhpi.ddy.buzz.service.TicketService;
 import ntukhpi.ddy.buzz.service.TrainService;
 import ntukhpi.ddy.buzz.service.WagonService;
@@ -68,6 +69,14 @@ public class TrainController {
         temp.format(DateTimeFormatter.ofPattern("HH:mm"));
         trainToSave.setTimeToArrive(temp);
         Train trainToSaveInDB = trainService.getTrainByNumber(trainToSave.getNumber());
+        String massage = cheackNumber(trainToSave);
+        if(massage != null){
+            model.addAttribute("train", trainToSave);
+            model.addAttribute("titleTrain", TRAIN_TEXT_EDIT);
+            model.addAttribute("errorString", massage);
+            model.addAttribute("wagons", wagonService.getAllWagons());
+            return "/admin/train";
+        }
         if (id.equals(0L)) {
             if (trainToSaveInDB == null) {
                 trainService.saveTrain(trainToSave);
@@ -133,4 +142,37 @@ public class TrainController {
         return "/admin/admin";
     }
 
+    private String cheackNumber(Train train){
+        int number = Integer.parseInt(train.getNumber());
+        trainType TrainType = train.getTrainType();
+        variantRuhu VariantRuhu = train.getVariantRuhu();
+        if(variantRuhu.seasonSummer.getDisplayName().equals(VariantRuhu.getDisplayName()) ||
+                variantRuhu.seasonDecember.getDisplayName().equals(VariantRuhu.getDisplayName()) ){
+            if(number < 151 || number > 298){
+                return "Сезоні поїзди мають номер від 151 до 298";
+            }
+        }else {
+            if(trainType.fastfull.getDisplayName().equals(TrainType.getDisplayName())){
+                if(number < 1 || number > 150){
+                    return "Швидкі поїзди мають номер від 1 до 150";
+                }
+            }
+            if(trainType.passenger.getDisplayName().equals(TrainType.getDisplayName())){
+                if(number < 301 || number > 450){
+                    return "Пасажирськи поїзди мають номер від 301 до 450";
+                }
+            }
+            if(trainType.interCityPlus.getDisplayName().equals(TrainType.getDisplayName())){
+                if(number < 751 || number > 788){
+                    return "Високошвідкісні поїзди мають номер від 751 до 788";
+                }
+            }
+            if(trainType.interCity.getDisplayName().equals(TrainType.getDisplayName())){
+                if(number < 701 || number > 750){
+                    return "Швидкісні поїзди мають номер від 701 до 750";
+                }
+            }
+        }
+        return null;
+    }
 }
