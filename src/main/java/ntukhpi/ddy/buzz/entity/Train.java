@@ -29,7 +29,7 @@ public class Train {
     private String number;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "trainType", nullable = false, length = 20)
+    @Column(name = "trainType", nullable = false, length = 4)
     @Convert(converter = trainTypeConverter.class)
     private trainType TrainType;
 

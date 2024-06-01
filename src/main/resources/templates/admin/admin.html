@@ -53,11 +53,6 @@
     <form action="/admin/trains/new" method="GET">
         <button class="btn btn-primary" style="color:white" accesskey="d">Додати Потяг</button>
     </form>
-    <select id="vr_filter" class="form-select-primary" name="vr_filter" onchange="filterByVR()">
-        <option value="всі">всі</option>
-        <option th:each="vr : ${T(ntukhpi.ddy.buzz.enums.trainType.trainType).values()}"
-                th:value="${vr}" th:text="${vr.getDisplayName()}"></option>
-    </select>
     <button  class="btn btn-primary" style="color:white" onclick="sortTableByIndex(0)">Сортування за номером потягу</button>
     <button class="btn btn-primary" style="color:white" onclick="sortTableValueDur(7)">Сортування за часом у дорозі</button>
     <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(3)">Сортування за місцем відправки</button>
@@ -65,6 +60,11 @@
     <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(9)">Сортування за відстаню</button>
     <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(6)">Сортування за часом відправки</button>
     <button class="btn btn-primary" style="color:white" onclick="sortTableByIndex(8)">Сортування за часом прибуття</button>
+    <select id="vr_filter" class="form-select-primary form-select-lg" name="vr_filter" onchange="filterByVR()">
+        <option value="всі">всі</option>
+        <option th:each="vr : ${T(ntukhpi.ddy.buzz.enums.trainType.trainType).values()}"
+                th:value="${vr}" th:text="${vr.getDisplayName()}"></option>
+    </select>
 </div>
 <div style="display: flex; align-items: center;">
     <b><label for="search-text" style="color: #3f48cc"> Пошук за місцем прибуття </label></b>
@@ -101,17 +101,17 @@
         <td th:text="${train.getDistance()} + ' км' "></td>
         <td>
             <form th:action="@{/admin/trains/edit/{id} (id=${train.id})}" >
-                <button type="submit" style="color: #3f48cc">  Редагувати  </button>
+                <button type="submit" class="btn btn-primary" style="color: white">  Редагувати  </button>
             </form>
         </td>
         <td>
             <form th:action="@{/admin/trains/report/{id} (id=${train.id})}" >
-                <button type="submit" style="color: #3f48cc">  Сформувати звіт  </button>
+                <button type="submit" class="btn btn-primary" style="color: white">  Сформувати звіт  </button>
             </form>
         </td>
         <td>
             <form th:action="@{/admin/trains/del/{id} (id=${train.id})}" >
-                <button type="submit" onclick="return confirmation()" style="color: #3f48cc">   Вилучити   </button>
+                <button type="submit" onclick="return confirmation()" class="btn btn-primary" style="color: white">   Вилучити   </button>
             </form>
         </td>
 

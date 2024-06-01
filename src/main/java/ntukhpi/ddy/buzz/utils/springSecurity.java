@@ -27,7 +27,7 @@ public class springSecurity {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests((requests) -> requests
-                  .anyRequest().permitAll()
+                        .requestMatchers("/**").permitAll()
                 )
 
                 .formLogin(

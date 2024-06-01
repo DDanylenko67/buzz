@@ -7,7 +7,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
           crossorigin="anonymous">
-    <title>BUZZ | Потяги</title>
     <link rel="stylesheet" href="/css/style.css" >
 </head>
 <body>
@@ -20,7 +19,7 @@
             <a href="/signUp" class="btn btn-light" style="color: #3f48cc" th:if="${!loggedIn}">Зареєструватися</a>
             <a href="/login" class="btn btn-primary" style="color: white" th:if="${!loggedIn}">Увійти</a>
             <a href="/logout" class="btn btn-light" style="color: #3f48cc" th:if="${loggedIn}">Вийти</a>
-            <a href="" class="btn btn-primary" style="color: white" th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}">Персональний кабінет</a>
+            <a href="/buzz/cabinet" class="btn btn-primary" style="color: white" th:if="${loggedIn}">Персональний кабінет</a>
             <a href="/admin" class="btn btn-danger" style="color: white" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">Адміністративна панель</a>
         </div>
 
@@ -48,45 +47,67 @@
                     <input type="text" class="form-control" autocomplete="off" th:field="*{pointDo}" placeholder="Куди" id="searchInputDo" oninput="searchDo()" required/>
                     <ul id="searchResultsDo"></ul>
                 </div>
-                <input type="date" class="form-control" autocomplete="off" th:field="*{date}" name="timeToGos" id="dateToGos" th:min="${minDate}" th:max="${maxDate}" required/>
-                <button type="submit" class="btn btn-primary">Знайти</button>
+                <input type="date" class="form-control" autocomplete="off" th:field="*{date}" th:value="${#dates.format(date, 'yyyy-MM-dd')}" name="timeToGos" id="dateToGos" th:min="${minDate}" th:max="${maxDate}" required/>                <button type="submit" class="btn btn-primary">Знайти</button>
             </div>
         </div>
     </div>
 </form>
 <div class="container my-5">
-    <table id="trains-table" class="table w-75">
-        <tr th:each="train: ${trains}">
-            <td>
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="card-title" style="color: #3f48cc; white-space: nowrap; display: inline-block;" th:text="${train.getNumber()}"></h2>
-                        <h3 class="card-title" style="color: #3f48cc; white-space: nowrap; display: inline-block;" th:text="${train.getTrainType().getDisplayName()}"></h3>                        <table class="table">
-                            <tr>
-                                <td> <h2 th:text="${train.getTimeToGo()} +' - '+ ${train.getTimeToArrive()}"> </h2></td>
-                            </tr>
-                            <tr>
-                                <td> <h3 th:text="'Тривалість: ' + ${train.getDuration()}"> </h3></td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <form th:action="@{/admin/trains/seat/{id} (id=${train.id})}" >
-                                        <h3 th:text="${train.getWagon().getWagonTypes().getDisplayName()} + ' ' + '   ' + '         від ' +
-                                        ${service.getTariffByTypes(train.getWagon().getWagonTypes(),
-                                        train.getTrainType()).compPrice(find.getDate(), train.getDistance(), train.getTrainType())} + '₴' "></h3>
-                                        <button type="submit" class="btn btn-primary" style="color: white">  Замовити  </button>
-                                    </form>
-                                </td>
-                            </tr>
-                        </table>
+    <div class="row">
+        <div class="col">
+            <table id="trains-table" class="table w-100" >
+                <div class="row mb-3 card" >
+                    <div class="col card-body">
+                        <form th:action="@{/buzz/trains/sort}" method="get">
+                            <input type="hidden" name="sortField" id="sortField" />
+                            <input type="hidden" name="pointVid" th:value="${find.getPointVid()}"/>
+                            <input type="hidden" name="pointDo" th:value="${find.getPointDo()}"  />
+                            <input type="hidden" name="date" th:value="${find.getDate()}"/>
+                            <button type="submit" class="btn btn-primary" onclick="document.getElementById('sortField').value='price'">Сортування за ціною</button>
+                            <button type="submit" class="btn btn-primary" onclick="document.getElementById('sortField').value='duration'">Сортування за часом у дорозі</button>
+                            <button type="submit" class="btn btn-primary" onclick="document.getElementById('sortField').value='departureTime'">Сортування за час відбуття</button>
+                        </form>
                     </div>
                 </div>
-            </td>
-        </tr>
-    </table>
+                <tr th:each="train: ${trains}">
+                    <td>
+                        <div class="card">
+                            <div class="card-body">
+                                <h2 class="card-title" style="color: #3f48cc; white-space: nowrap; display: inline-block;" th:text="${train.getNumber()}"></h2>
+                                <h3 class="card-title" style="color: #3f48cc; white-space: nowrap; display: inline-block;" th:text="${train.getTrainType().getDisplayName()}"></h3>
+                                <table id="trains" class="table" >
+                                    <tr>
+                                        <td> <h3 th:text="${train.getPointVid()} +' -> ' +${train.getPointDo()}"> </h3></td>
+                                    </tr>
+                                    <tr>
+                                        <td> <h2 th:text="${train.getTimeToGo()} +' - '+ ${train.getTimeToArrive()}"> </h2></td>
+                                    </tr>
+                                    <tr>
+                                        <td> <h3 th:text="'Тривалість: ' + ${train.getDuration()}"> </h3></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <form th:action="@{/buzz/trains/seat/{id} (id=${train.id})}" >
+                                                <input type="hidden" name="date" th:value="${find.getDate()}"/>
+                                                <input type="hidden" name="wagon" th:value="${1}"/>
+                                                <h3 th:text="${train.getWagon().getWagonTypes().getDisplayName()} +', вільних місць ' + ${ticketService.findByTicketsByDate(train.getId(), find.getDate())}"></h3>
+                                                <h3></h3>
+                                                <div style="display: flex; text-align: center; justify-content: center">
+                                                    <h3 th:text=" 'від ' + ${service.getTariffByTypes(train.getWagon(), train.getTrainType()).compPrice(find.getDate(), train.getDistance(), train.getTrainType())} + '₴' "></h3>
+                                                    <button type="submit" class="btn btn-primary" style="color: white; margin-left: 10px;">Замовити</button>
+                                                </div>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
-
-
 <nav class="navbar fixed-bottom navbar-expand-lg nav-dark" style="background-color: #3f48cc">
     <div class="container">
         <a style="color: white">Технічна підтримка: 0 (800) 503-111</a>

@@ -10,6 +10,8 @@ import ntukhpi.ddy.buzz.enums.wagonType.wagonType;
 import ntukhpi.ddy.buzz.enums.wagonType.wagonTypeConverter;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,10 +38,9 @@ public class Tariff {
     @Convert(converter = trainTypeConverter.class)
     private trainType trainTypes;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "wagonType", nullable = false, length = 20)
-    @Convert(converter = wagonTypeConverter.class)
-    private wagonType wagonTypes;
+    @ManyToOne
+    @JoinColumn(name = "wagon_id")
+    private Wagon wagon;
 
     @Column(nullable = false, length = 10)
     private double basePrice;
@@ -51,15 +52,15 @@ public class Tariff {
     private double baggageBasePrice;
 
     @Column(nullable = false, length = 4)
-    private double decadeSumBaggage;
+    private double baggageDecadeSum;
 
     @Column(nullable = false, length = 4)
     private double indexComfort;
 
-    public Tariff(String date, String TrainTypes, String WagonType, double basePrice, double decadeSum, double indexComfort) {
+    public Tariff(String date, String TrainTypes, Wagon wagon, double basePrice, double decadeSum, double indexComfort) {
         this.date = LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
         this.trainTypes = trainType.getByType(TrainTypes);
-        this.wagonTypes = wagonType.getByType(WagonType);
+        this.wagon = wagon;
         this.decadeSum = decadeSum;
         this.basePrice = basePrice;
         this.indexComfort = indexComfort;
@@ -69,7 +70,7 @@ public class Tariff {
         this.id = 0L;
         this.date = LocalDate.now();
         this.trainTypes = trainType.getByType(TrainTypes);
-        this.wagonTypes = wagonType.interCitySecond;
+        this.wagon =  new Wagon("Тверьский завод");
         this.decadeSum = 0.66;
         this.basePrice = 11.42;
     }
@@ -78,13 +79,13 @@ public class Tariff {
         final StringBuilder sb = new StringBuilder("" + id + ": ");
         sb.append(date).append(" - ");
         sb.append(trainTypes.getDisplayName()).append(" - ");
-        sb.append(wagonTypes.getDisplayName()).append(" - ");
+        sb.append(wagon.getWagonTypes().getDisplayName()).append(" - ");
         sb.append(decadeSum).append(" - ");
         sb.append(basePrice);
         return sb.toString();
     }
 
-    public String compPrice(LocalDate date, int distance, trainType TrainType) {
+    public Double compPrice(LocalDate date, int distance, trainType TrainType) {
         double koefIndex = 1;
         double indexInc = 1;
         double price = 0;
@@ -117,8 +118,8 @@ public class Tariff {
              price += decadeSum;
         }
         System.out.println("Price = " + price + " KoefIndex = " + koefIndex + " IndexInc = " + indexInc + " IndexComfort  =" + indexComfort);
-        price = price * koefIndex * indexComfort * indexInc;
-        return String.format("%.1f", price);
+        price = price * koefIndex * indexComfort * indexInc;;
+        return Math.round(price * 100.0) / 100.0;
     }
 
 
