@@ -1,5 +1,6 @@
 package ntukhpi.ddy.buzz;
 
+import net.bytebuddy.asm.Advice;
 import ntukhpi.ddy.buzz.entity.Tariff;
 import ntukhpi.ddy.buzz.entity.Ticket;
 import ntukhpi.ddy.buzz.entity.Train;
@@ -28,11 +29,11 @@ public class TestTicket {
 
     @Test
     void addTickets(){
-        Ticket ticket = new Ticket(trainService.getTrainById(1L), "Денис Даниленко Юрійович", "13161231",5, 5, "2024-05-25", 600);
+        Ticket ticket = new Ticket(trainService.getTrainById(1L), "Денис Даниленко Юрійович", "13161231",5, 5, LocalDate.of(2024, 5, 25), 600);
         ticketService.saveTicket(ticket);
-        Ticket ticket1 = new Ticket(trainService.getTrainById(1L), "Кирил Буряк Сергійович", "13312354",5, 6, "2024-05-25", 600);
+        Ticket ticket1 = new Ticket(trainService.getTrainById(1L), "Кирил Буряк Сергійович", "13312354",5, 6, LocalDate.of(2024, 5, 25), 600);
         ticketService.saveTicket(ticket1);
-        Ticket ticket2 = new Ticket(trainService.getTrainById(1L), "Валентин Острозький Кирилович", "131231256",5, 7, "2024-05-25", 600);
+        Ticket ticket2 = new Ticket(trainService.getTrainById(1L), "Валентин Острозький Кирилович", "131231256",5, 7, LocalDate.of(2024, 5, 25), 600);
         ticketService.saveTicket(ticket2);
     }
 
@@ -43,7 +44,7 @@ public class TestTicket {
 
     @Test
     void CRUDTest(){
-        Ticket ticket = new Ticket(trainService.getTrainById(1L), "Никита Буряк Сергійович", "13161231",5, 8, "2024-05-25", 600);
+        Ticket ticket = new Ticket(trainService.getTrainById(1L), "Никита Буряк Сергійович", "13161231",5, 8, LocalDate.of(2024, 5, 25), 600);
         System.out.println(ticket);
         ticketService.saveTicket(ticket);
         Ticket temp = ticketService.getTicketByData(LocalDate.of(2024, 5, 25), 8, 5);
@@ -61,7 +62,5 @@ public class TestTicket {
 
         temp1.setDateToGo(LocalDate.of(2024, 1, 20));
         temp2.setDateToGo(LocalDate.of(2024, 1, 21));
-
-        Tariff tariff = tariffService.getTariffByTypes(temp1.getTrain().getWagon().getWagonTypes(), temp1.getTrain().getTrainType());;
     }
 }

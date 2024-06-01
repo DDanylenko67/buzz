@@ -5,7 +5,7 @@
     try {
     const response = await fetch('/api/citiesVid');
     if (!response.ok) {
-    throw new Error('Ошибка загрузки данных');
+    throw new Error('помилка');
 }
     const jsonData = await response.json();
 
@@ -19,14 +19,14 @@
 }
     dataVid = uniqueData;
 } catch (error) {
-    console.error('Произошла ошибка:', error);
+    console.error('помилка:', error);
 }
 }
     async function fetchDataDo() {
     try {
     const response = await fetch('/api/citiesDo');
     if (!response.ok) {
-    throw new Error('Ошибка загрузки данных');
+    throw new Error('помилка');
 }
     const jsonData = await response.json();
 
@@ -40,7 +40,7 @@
 }
     dataDo = uniqueData;
 } catch (error) {
-    console.error('Произошла ошибка:', error);
+    console.error('помилка:', error);
 }
 }
     fetchDataVid();

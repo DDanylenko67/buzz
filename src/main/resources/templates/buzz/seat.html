@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+          crossorigin="anonymous">
+    <title>BUZZ | Місце</title>
+    <link rel="stylesheet" href="/css/style.css" >
+    <style>
+        .karta {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px; /* закругление углов */
+            padding: 20px; /* отступы внутри карточки */
+            width: 1000px; /* фиксированная ширина карточки */
+            margin: 0 auto; /* центрирование карточки на странице */
+        }
+
+        .mesta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .mesto {
+            width: calc(10% - 20px);
+            height: 50px;
+            margin-bottom: 10px;
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #fff;
+            box-sizing: border-box;
+        }
+
+        .mesto button {
+            width: 100%;
+            height: 100%;
+            padding: 5px;
+            font-size: 16px;
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+        }
+
+        .mesto button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .mesto button.btn-primary {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .mesto button.btn-danger {
+            background-color: #dc3545;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<nav class="navbar fixed-top navbar-expand-lg nav-dark" style="background-color: #3f48cc">
+    <div class="container">
+        <a class="navbar-brand" href="/buzz">
+            <img src="/images/logo.jpg" alt="BUZZ" width="200" height="100">
+        </a>
+        <div class="d-flex">
+            <a href="/signUp" class="btn btn-light" style="color: #3f48cc" th:if="${!loggedIn}">Зареєструватися</a>
+            <a href="/login" class="btn btn-primary" style="color: white" th:if="${!loggedIn}">Увійти</a>
+            <a href="/logout" class="btn btn-light" style="color: #3f48cc" th:if="${loggedIn}">Вийти</a>
+            <a href="/buzz/cabinet" class="btn btn-primary" style="color: white" th:if="${loggedIn}">Персональний кабінет</a>
+            <a href="/admin" class="btn btn-danger" style="color: white" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">Адміністративна панель</a>
+        </div>
+    </div>
+</nav>
+
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<div class="container card " style="width: 550px">
+<h3  class="text-center" style="color: #3f48cc">Виберіть вагон</h3>
+<div style="display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;">
+    <form th:action="@{/buzz/trains/seat/{Id} (Id=${train.getId()})}">
+        <input type="hidden" name="date" th:value="${date}"/>
+    <div class="button-container">
+        <th:block th:each="i : ${#numbers.sequence(1, 10)}">
+            <button class="btn btn-primary" th:text="${i}" name="wagon" th:value="${i}" type="submit"></button>
+        </th:block>
+    </div>
+    <input type="hidden" id="selectedWagon" name="wagon" value=""/>
+    <br>
+    </form>
+</div>
+</div>
+<br>
+<br>
+
+    <div th:if="${train.getWagon().getNumberOfSeats() == 20} " class="karta" STYLE=" width: 530px;">
+        <div style="display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px; color: #3f48cc">
+            <h3 th:text="${train.getWagon().getWagonTypes().getDisplayName()} + ' №' + ${wagon.getWagon()}"></h3>
+        </div>
+        <div class="mesta" style="gap: 3px">
+            <div th:each="i : ${#numbers.sequence(1, 20)}">
+                <div th:if="${tickets.size() == 0}">
+                    <div th:if="${i < 10}">
+                        <div>
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0'+${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div>
+                        <div th:if="${i > 9}">
+                            <div>
+                                <form action="/buzz/trains/ticket" method="GET">
+                                    <input type="hidden" name="date" th:value="${date}"/>
+                                    <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                    <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                    <input type="hidden" name="seat" th:value="${i}"/>
+                                    <button th:text="${i}" class="btn btn-primary"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${tickets.size() > 0}">
+                    <div th:if="${i < 10}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0' + ${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:if="${i > 9}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                </div>
+            </div>
+            <br>
+            <br>
+            <br>
+            <br>
+        </div>
+    </div>
+    <div th:if="${train.getWagon().getNumberOfSeats() == 18}" class="karta" STYLE=" width: 490px;">
+        <div style="display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px; color: #3f48cc">
+            <h3 th:text="${train.getWagon().getWagonTypes().getDisplayName()} + ' №' + ${wagon.getWagon()}"></h3>
+        </div>
+        <div class="mesta" style="gap: 3px">
+            <div th:each="i : ${#numbers.sequence(1, 18)}">
+                <div th:if="${tickets.size() == 0}">
+                    <div th:if="${i < 10}">
+                        <div>
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0'+${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div>
+                        <div th:if="${i > 9}">
+                            <div>
+                                <form action="/buzz/trains/ticket" method="GET">
+                                    <input type="hidden" name="date" th:value="${date}"/>
+                                    <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                    <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                    <input type="hidden" name="seat" th:value="${i}"/>
+                                    <button th:text="${i}" class="btn btn-primary"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${tickets.size() > 0}">
+                    <div th:if="${i < 10}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0' + ${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:if="${i > 9}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div>
+                </div>
+            </div>
+        <br>
+        <br>
+        </div>
+
+    </div>
+    <div th:if="${train.getWagon().getNumberOfSeats() == 40} " class="karta" STYLE=" width: 1000px;">
+        <div style="display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px; color: #3f48cc">
+            <h3 th:text="${train.getWagon().getWagonTypes().getDisplayName()} + ' №' + ${wagon.getWagon()}"></h3>
+        </div>
+        <div class="mesta" style="gap: 3px">
+            <div th:each="i : ${#numbers.sequence(1, 40)}">
+                <div th:if="${tickets.size() == 0}">
+                    <div th:if="${i < 10}">
+                        <div>
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0'+${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div>
+                        <div th:if="${i > 9}">
+                            <div>
+                                <form action="/buzz/trains/ticket" method="GET">
+                                    <input type="hidden" name="date" th:value="${date}"/>
+                                    <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                    <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                    <input type="hidden" name="seat" th:value="${i}"/>
+                                    <button th:text="${i}" class="btn btn-primary"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${tickets.size() > 0}">
+                    <div th:if="${i < 10}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0' + ${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:if="${i > 9}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                </div>
+            </div>
+            <br>
+            <br>
+            <br>
+            <br>
+        </div>
+
+    </div>
+    <div th:if="${train.getWagon().getNumberOfSeats() == 54} " class="karta" STYLE=" width: 900px;">
+        <div style="display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px; color: #3f48cc">
+            <h3 th:text="${train.getWagon().getWagonTypes().getDisplayName()} + ' №' + ${wagon.getWagon()}"></h3>
+        </div>
+        <div class="mesta" style="gap: 3px">
+            <div th:each="i : ${#numbers.sequence(1, 54)}">
+                <div th:if="${tickets.size() == 0}">
+                    <div th:if="${i < 10}">
+                        <div>
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0'+${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div>
+                        <div th:if="${i > 9}">
+                            <div>
+                                <form action="/buzz/trains/ticket" method="GET">
+                                    <input type="hidden" name="date" th:value="${date}"/>
+                                    <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                    <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                    <input type="hidden" name="seat" th:value="${i}"/>
+                                    <button th:text="${i}" class="btn btn-primary"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${tickets.size() > 0}">
+                    <div th:if="${i < 10}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0' + ${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:if="${i > 9}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${i == 33}" >
+                    <br>
+                    <br>
+                    <br>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div th:if="${train.getWagon().getNumberOfSeats() == 44}" class="karta" STYLE=" width: 1100px;">
+        <div style="display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px; color: #3f48cc">
+            <h3 th:text="${train.getWagon().getWagonTypes().getDisplayName()} + ' №' + ${wagon.getWagon()}"></h3>
+        </div>
+        <div class="mesta" style="gap: 3px">
+            <div th:each="i : ${#numbers.sequence(1, 44)}">
+                <div th:if="${tickets.size() == 0}">
+                    <div th:if="${i < 10}">
+                        <div>
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0'+${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div>
+                        <div th:if="${i > 9}">
+                            <div>
+                                <form action="/buzz/trains/ticket" method="GET">
+                                    <input type="hidden" name="date" th:value="${date}"/>
+                                    <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                    <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                    <input type="hidden" name="seat" th:value="${i}"/>
+                                    <button th:text="${i}" class="btn btn-primary"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${tickets.size() > 0}">
+                    <div th:if="${i < 10}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0' + ${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:if="${i > 9}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div>
+                </div>
+            </div>
+        <br>
+        <br>
+        <br>
+        <br>
+        </div>
+
+    </div>
+    <div th:if="${train.getWagon().getNumberOfSeats() == 68}" class="karta" STYLE=" width: 1125px;">
+        <div style="display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px; color: #3f48cc">
+            <h3 th:text="${train.getWagon().getWagonTypes().getDisplayName()} + ' №' + ${wagon.getWagon()}"></h3>
+        </div>
+        <div class="mesta" style="gap: 3px">
+            <div th:each="i : ${#numbers.sequence(1, 68)}">
+                <div th:if="${tickets.size() == 0}">
+                    <div th:if="${i < 10}">
+                        <div>
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0'+${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div>
+                        <div th:if="${i > 9}">
+                            <div>
+                                <form action="/buzz/trains/ticket" method="GET">
+                                    <input type="hidden" name="date" th:value="${date}"/>
+                                    <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                    <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                    <input type="hidden" name="seat" th:value="${i}"/>
+                                    <button th:text="${i}" class="btn btn-primary"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${tickets.size() > 0}">
+                    <div th:if="${i < 10}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0' + ${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:if="${i > 9}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                            <div th:if="${i == 46}" >
+                                <br>
+                                <br>
+                            </div>
+                    </div>
+                </div>
+                <div>
+                    <br>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:if="${train.getWagon().getNumberOfSeats() == 30}" class="karta" STYLE=" width: 775px;">
+        <div style="display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px; color: #3f48cc">
+            <h3 th:text="${train.getWagon().getWagonTypes().getDisplayName()} + ' №' + ${wagon.getWagon()}"></h3>
+        </div>
+        <div class="mesta" style="gap: 3px">
+            <div th:each="i : ${#numbers.sequence(1, 30)}">
+                <div th:if="${tickets.size() == 0}">
+                    <div th:if="${i < 10}">
+                        <div>
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0'+${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div>
+                        <div th:if="${i > 9}">
+                            <div>
+                                <form action="/buzz/trains/ticket" method="GET">
+                                    <input type="hidden" name="date" th:value="${date}"/>
+                                    <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                    <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                    <input type="hidden" name="seat" th:value="${i}"/>
+                                    <button th:text="${i}" class="btn btn-primary"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${tickets.size() > 0}">
+                    <div th:if="${i < 10}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0' + ${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:if="${i > 9}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <br>
+    </div>
+    <div th:if="${train.getWagon().getNumberOfSeats() == 40}" class="karta" STYLE=" width: 975px;">
+        <div style="display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px; color: #3f48cc">
+            <h3 th:text="${train.getWagon().getWagonTypes().getDisplayName()} + ' №' + ${wagon.getWagon()}"></h3>
+        </div>
+        <div class="mesta" style="gap: 3px">
+            <div th:each="i : ${#numbers.sequence(1, 40)}">
+                <div th:if="${tickets.size() == 0}">
+                    <div th:if="${i < 10}">
+                        <div>
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0'+${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div>
+                        <div th:if="${i > 9}">
+                            <div>
+                                <form action="/buzz/trains/ticket" method="GET">
+                                    <input type="hidden" name="date" th:value="${date}"/>
+                                    <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                    <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                    <input type="hidden" name="seat" th:value="${i}"/>
+                                    <button th:text="${i}" class="btn btn-primary"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${tickets.size() > 0}">
+                    <div th:if="${i < 10}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0' + ${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:if="${i > 9}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                </div>
+                <div>
+                </div>
+            </div>
+        </div>
+            <br>
+            <br>
+            <br>
+            <br>
+    </div>
+    </div>
+
+        <div th:if="${train.getWagon().getNumberOfSeats() == 60}" class="karta" STYLE=" width: 1000px;">
+            <div style="display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px; color: #3f48cc">
+                <h3 th:text="${train.getWagon().getWagonTypes().getDisplayName()} + ' №' + ${wagon.getWagon()}"></h3>
+            </div>
+            <div class="mesta" style="gap: 3px">
+                <div th:each="i : ${#numbers.sequence(1, 80)}">
+                    <div th:if="${tickets.size() == 0}">
+                        <div th:if="${i < 10}">
+                            <div>
+                                <form action="/buzz/trains/ticket" method="GET">
+                                    <input type="hidden" name="date" th:value="${date}"/>
+                                    <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                    <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                    <input type="hidden" name="seat" th:value="${i}"/>
+                                    <button th:text="'0'+${i}" class="btn btn-primary"></button>
+                                </form>
+                            </div>
+                        </div>
+                        <div>
+                            <div th:if="${i > 9}">
+                                <div>
+                                    <form action="/buzz/trains/ticket" method="GET">
+                                        <input type="hidden" name="date" th:value="${date}"/>
+                                        <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                        <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                        <input type="hidden" name="seat" th:value="${i}"/>
+                                        <button th:text="${i}" class="btn btn-primary"></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${tickets.size() > 0}">
+                        <div th:if="${i < 10}">
+                            <div  th:if="${array[i] == 1}">
+                                <button th:text="${i}" class="btn btn-danger" disabled></button>
+                            </div>
+                            <div  th:if="${array[i] != 1}">
+                                <form action="/buzz/trains/ticket" method="GET">
+                                    <input type="hidden" name="date" th:value="${date}"/>
+                                    <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                    <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                    <input type="hidden" name="seat" th:value="${i}"/>
+                                    <button th:text="'0' + ${i}" class="btn btn-primary"></button>
+                                </form>
+                            </div>
+                        </div>
+                        <div th:if="${i > 9}">
+                            <div  th:if="${array[i] == 1}">
+                                <button th:text="${i}" class="btn btn-danger" disabled></button>
+                            </div>
+                            <div  th:if="${array[i] != 1}">
+                                <form action="/buzz/trains/ticket" method="GET">
+                                    <input type="hidden" name="date" th:value="${date}"/>
+                                    <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                    <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                    <input type="hidden" name="seat" th:value="${i}"/>
+                                    <button th:text="${i}" class="btn btn-primary"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${i == 30}">
+                        <br>
+                        <br>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:if="${train.getWagon().getNumberOfSeats() == 80}" class="karta" STYLE=" width: 1000px;">
+        <div style="display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px; color: #3f48cc">
+            <h3 th:text="${train.getWagon().getWagonTypes().getDisplayName()} + ' №' + ${wagon.getWagon()}"></h3>
+        </div>
+        <div class="mesta" style="gap: 3px">
+            <div th:each="i : ${#numbers.sequence(1, 80)}">
+                <div th:if="${tickets.size() == 0}">
+                    <div th:if="${i < 10}">
+                        <div>
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0'+${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div>
+                        <div th:if="${i > 9}">
+                            <div>
+                                <form action="/buzz/trains/ticket" method="GET">
+                                    <input type="hidden" name="date" th:value="${date}"/>
+                                    <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                    <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                    <input type="hidden" name="seat" th:value="${i}"/>
+                                    <button th:text="${i}" class="btn btn-primary"></button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${tickets.size() > 0}">
+                    <div th:if="${i < 10}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="'0' + ${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                    <div th:if="${i > 9}">
+                        <div  th:if="${array[i] == 1}">
+                            <button th:text="${i}" class="btn btn-danger" disabled></button>
+                        </div>
+                        <div  th:if="${array[i] != 1}">
+                            <form action="/buzz/trains/ticket" method="GET">
+                                <input type="hidden" name="date" th:value="${date}"/>
+                                <input type="hidden" name="wagon" th:value="${wagon.getWagon()}"/>
+                                <input type="hidden" name="trainId" th:value="${train.getId()}"/>
+                                <input type="hidden" name="seat" th:value="${i}"/>
+                                <button th:text="${i}" class="btn btn-primary"></button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${i == 40}">
+                    <br>
+                    <br>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form th:action="@{/buzz/trains}" th:object="${findTrain}" method="GET">
+        <div class="card mx-auto" style="width: 100px">
+            <div class="text-center">
+                <input type="hidden" name="pointVid" th:value="*{pointVid}">
+                <input type="hidden" name="pointDo" th:value="*{pointDo}">
+                <input type="hidden" name="date" th:value="*{date}">
+                <button class="btn btn-primary">Назад</button>
+            </div>
+        </div>
+    </form>
+</div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<nav class="navbar fixed-bottom navbar-expand-lg nav-dark" style="background-color: #3f48cc">
+    <div class="container">
+        <a style="color: white">Технічна підтримка: 0 (800) 503-111</a>
+        <a style="color: white">Довідкова служба: 0 (800) 503-111</a>
+        <a style="color: white">Email: booking@uz.gov.ua</a>
+        <a style="color: white">Контакт центр "Якість та сервіс": 0 (800) 503-111</a>
+    </div>
+</nav>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const mesta = document.querySelectorAll('.mesto');
+        mesta.forEach(function(mesto, index) {
+            if (index % 2 === 0) {
+                mesto.classList.add('alternate-row');
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 package ntukhpi.ddy.buzz.service;
 
 import ntukhpi.ddy.buzz.entity.Tariff;
+import ntukhpi.ddy.buzz.entity.Wagon;
 import ntukhpi.ddy.buzz.enums.trainType.trainType;
 import ntukhpi.ddy.buzz.enums.wagonType.wagonType;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -16,5 +17,5 @@ public interface TariffService {
     void deleteTariffById(Long id);
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     Tariff getTariffByDate(LocalDate localDate);
-    Tariff getTariffByTypes(wagonType wagonType, trainType trainType);
+    Tariff getTariffByTypes(Wagon wagon, trainType trainType);
 }

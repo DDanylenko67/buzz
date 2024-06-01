@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmail(email);
     }
 
+
     @Override
     public List<UserDto> findAllUsers() {
         List<User> users = userRepository.findAll();

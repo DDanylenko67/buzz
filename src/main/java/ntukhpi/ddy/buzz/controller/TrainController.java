@@ -70,54 +70,65 @@ public class TrainController {
         trainToSave.setTimeToArrive(temp);
         Train trainToSaveInDB = trainService.getTrainByNumber(trainToSave.getNumber());
         String massage = cheackNumber(trainToSave);
-        if(massage != null){
+        if(massage == null) {
+            massage = checkWagon(trainToSave);
+            if (massage != null) {
+                model.addAttribute("train", trainToSave);
+                model.addAttribute("titleTrain", TRAIN_TEXT_EDIT);
+                model.addAttribute("errorString", massage);
+                model.addAttribute("wagons", wagonService.getAllWagons());
+                return "/admin/train";
+            }
+            if (id.equals(0L)) {
+                if (trainToSaveInDB == null) {
+                    trainService.saveTrain(trainToSave);
+                    return "redirect:/admin";
+                } else {
+                    model.addAttribute("train", trainToSave);
+                    model.addAttribute("titleTrain", TRAIN_TEXT_INS);
+                    model.addAttribute("wagons", wagonService.getAllWagons());
+                    model.addAttribute("errorString", "Потяг за таким номер вже існує!");
+                    return "/admin/train";
+                }
+            } else {
+                if (trainToSaveInDB == null || (trainToSaveInDB != null && trainToSaveInDB.getId() == trainToSave.getId())) {
+                    Train existingTrain = trainService.getTrainById(id);
+                    if (existingTrain == null) {
+                        model.addAttribute("train", trainToSave);
+                        model.addAttribute("titleTrain", TRAIN_TEXT_EDIT);
+                        model.addAttribute("errorString", "Потяг, який потрібно обновити не знайдено в базі даних!");
+                        model.addAttribute("wagons", wagonService.getAllWagons());
+                        return "/admin/train";
+                    } else {
+                        trainService.updateTrain(existingTrain.getId(), trainToSave);
+                        return "redirect:/admin";
+                    }
+                } else {
+                    model.addAttribute("train", trainToSave);
+                    model.addAttribute("titleTrain", TRAIN_TEXT_EDIT);
+                    model.addAttribute("wagons", wagonService.getAllWagons());
+                    model.addAttribute("errorString", "Потяг за таким номер вже існує!");
+                    return "/admin/train";
+                }
+            }
+        }
+        else {
             model.addAttribute("train", trainToSave);
             model.addAttribute("titleTrain", TRAIN_TEXT_EDIT);
             model.addAttribute("errorString", massage);
             model.addAttribute("wagons", wagonService.getAllWagons());
             return "/admin/train";
         }
-        if (id.equals(0L)) {
-            if (trainToSaveInDB == null) {
-                trainService.saveTrain(trainToSave);
-                return "redirect:/admin";
-            } else {
-                model.addAttribute("train", trainToSave);
-                model.addAttribute("titleTrain", TRAIN_TEXT_INS);
-                model.addAttribute("wagons", wagonService.getAllWagons());
-                model.addAttribute("errorString", "Потяг за таким номер вже існує!");
-                return "/admin/train";
-            }
-        } else {
-            if ( trainToSaveInDB == null || (trainToSaveInDB != null && trainToSaveInDB.getId() == trainToSave.getId())) {
-                Train existingTrain = trainService.getTrainById(id);
-                if (existingTrain == null) {
-                    model.addAttribute("train", trainToSave);
-                    model.addAttribute("titleTrain", TRAIN_TEXT_EDIT);
-                    model.addAttribute("errorString", "Потяг, який потрібно обновити не знайдено в базі даних!");
-                    model.addAttribute("wagons", wagonService.getAllWagons());
-                    return "/admin/train";
-                } else {
-                    trainService.updateTrain(existingTrain.getId(), trainToSave);
-                    return "redirect:/admin";
-                }
-            } else {
-                model.addAttribute("train", trainToSave);
-                model.addAttribute("titleTrain", TRAIN_TEXT_EDIT);
-                model.addAttribute("wagons", wagonService.getAllWagons());
-                model.addAttribute("errorString", "Потяг за таким номер вже існує!");
-                return "/admin/train";
-            }
-        }
     }
     @GetMapping("/admin/trains/del/{idTrainForDelete}")
     public String DeleteTrain(Model model, @PathVariable Long idTrainForDelete){
         String messageDeleteError = "";
+
         Train delTrainInDB = trainService.getTrainById(idTrainForDelete);
         if (delTrainInDB != null) {
             StringBuilder sbMessageAboutPresent = new StringBuilder();
             String ticketPresent = ticketService.getInfoPresenceTicketByIDTrain(idTrainForDelete);
-            if (ticketPresent != null)   {
+            if (!ticketPresent.isEmpty()) {
                 sbMessageAboutPresent.append("<br><br>").append(ticketPresent);
             }
             if (sbMessageAboutPresent.toString().isEmpty()) {
@@ -131,17 +142,32 @@ public class TrainController {
         }
         if (!messageDeleteError.isEmpty()) {
             model.addAttribute("error_del_message", messageDeleteError);
-            model.addAttribute("ret_page", "/admin");
+            model.addAttribute("ret_page", "/trains");
             return "/admin/crud_error";
         } else {
-            return "redirect:/admin";
+            return "redirect:/buzz";
         }
     }
-    @GetMapping("/admin/trains/report/{id}")
-    public String ReportTrain(Model model, @PathVariable Long id){
-        return "/admin/admin";
-    }
 
+    private String checkWagon(Train train){
+        if(train.getTrainType().getDisplayName().equals(trainType.interCityPlus.getDisplayName())
+                || train.getTrainType().getDisplayName().equals(trainType.interCity.getDisplayName())){
+            if(train.getWagon().getWagonTypes().getDisplayName().equals(wagonType.interCityFirst.getDisplayName()) ||
+                    train.getWagon().getWagonTypes().getDisplayName().equals(wagonType.interCitySecond.getDisplayName())){
+                return null;
+            }
+            else {
+                return "Потяги інтерсіті мають номер лише сидячі вагони!";
+            }
+        }
+        else {
+            if(train.getWagon().getWagonTypes().getDisplayName().equals(wagonType.interCityFirst.getDisplayName()) ||
+                    train.getWagon().getWagonTypes().getDisplayName().equals(wagonType.interCitySecond.getDisplayName())){
+                return "Звичайні потяги, не можуть мати вагони від інтерсіті";
+            }
+            return null;
+        }
+    }
     private String cheackNumber(Train train){
         int number = Integer.parseInt(train.getNumber());
         trainType TrainType = train.getTrainType();

@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -24,5 +26,12 @@ public class AdminController {
         List<Train> trains = trainService.getAllTrains();
         model.addAttribute("trains", trains);
         return "admin/admin";
+    }
+    @GetMapping("/admin/trains/report/{idTrain}")
+    public String report(Model model,  @PathVariable Long idTrain){
+        model.addAttribute("train", trainService.getTrainById(idTrain));
+        model.addAttribute("max", LocalDate.now().minusDays(1));
+        model.addAttribute("min", LocalDate.now().minusYears(1));
+        return "/admin/report";
     }
 }

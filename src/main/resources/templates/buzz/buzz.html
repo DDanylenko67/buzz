@@ -17,7 +17,7 @@
                     <a href="/signUp" class="btn btn-light" style="color: #3f48cc" th:if="${!loggedIn}">Зареєструватися</a>
                     <a href="/login" class="btn btn-primary" style="color: white" th:if="${!loggedIn}">Увійти</a>
                     <a href="/logout" class="btn btn-light" style="color: #3f48cc" th:if="${loggedIn}">Вийти</a>
-                    <a href="" class="btn btn-primary" style="color: white" th:if="${#authorization.expression('hasRole(''ROLE_USER'')')}">Персональний кабінет</a>
+                    <a href="/buzz/cabinet" class="btn btn-primary" style="color: white" th:if="${loggedIn}">Персональний кабінет</a>
                     <a href="/admin" class="btn btn-danger" style="color: white" th:if="${#authorization.expression('hasRole(''ROLE_ADMIN'')')}">Адміністративна панель</a>
                 </div>
         </div>
@@ -56,12 +56,11 @@
     </form>
     <br>
     <br>
-
     <div class="container d-flex justify-content-center align-items-center mb-2 my-5">
         <div class="recent-purchases card">
             <h2>Щойно придбали</h2>
-            <ul>
-                <li th:each="ticket :${last4Tickets}">
+            <ul class="list-group list-group-flush" style="text-align: left">
+                <li th:each="ticket :${last4Tickets}" class="list-group-item">
                     <span th:text="${ticket.train.pointVid}"></span> -> <span th:text="${ticket.train.pointDo}"></span>
                 </li>
 
